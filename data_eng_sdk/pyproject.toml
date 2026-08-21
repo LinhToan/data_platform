@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "data-eng-sdk"
+version = "0.1.1"
+description = "Internal data platform SDK for ingestion, validation, and observability"
+readme = "README.md"
+requires-python = ">=3.10"
+
+authors = [
+  { name = "Linh Toan" }
+]
+
+dependencies = [
+  "pyspark>=3.4",
+  "requests>=2.31",
+  "pydantic>=2.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
