@@ -8,18 +8,16 @@ from tests.qa_checks import test_null_columns
 def main(dates_list: list[date]) -> DataFrame:
     """
     Overview:
-        Reads in the Yardi PHA CSV file and cleans the column names, such as:
-        camel case to snake case, replace special characters with underscore, and convert to lower case.
+        Reads in the sample CSV file and runs data validation tests.
     Parameters:
-        start_date: Date to start reading in the CSV files.
-        end_date: Date to end reading in the CSV files.
+        dates_list: List of dates for year/month/day file directory
     Return:
         cleaned_df: Cleaned dataframe with all columns cleaned.
     """
 
     spark = SparkSession.builder.getOrCreate()
 
-    azure_path = "/mnt/emprisedatastorage/yardi"
+    azure_path = "/mnt/storage_account/storage_container"
 
     paths = [f"{azure_path}/{run_date}/*" for run_date in dates_list]
 
