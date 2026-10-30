@@ -1,8 +1,7 @@
 ### Overview
-# This notebook gets reads in the Yardi PHA in CSV format from and updates 
+# This notebook gets reads in the sample file in CSV format from and updates 
 # the respective delta table in Unity Catalog. 
-# The files arrive every business day at 9:00 AM CST, 
-# and the corresponding GoAnywhere job runs accordingly. 
+# The files arrive every business day at 9:00 AM CST. 
 
 ### Frequency
 # Business days at 9:15 AM CST.
@@ -24,8 +23,8 @@ from main import main
 
 if __name__=="__main__":
     unity_config = {
-        "unity_path": "laboratory.linh",
-        "table_name": "pha",
+        "unity_path": "catalog.schema",
+        "table_name": "table",
         "mode": "daily_snapshot"
     }
 
