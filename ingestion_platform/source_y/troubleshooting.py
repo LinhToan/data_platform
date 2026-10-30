@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC
 # MAGIC ### Overview
-# MAGIC This notebook gets reads in the Yardi PHA in CSV format from and updates the respective delta table in Unity Catalog. The files arrive every business day at 9:00 AM CST, and the corresponding GoAnywhere job runs accordingly. 
+# MAGIC This notebook gets reads in the sample file in CSV format from and updates the respective delta table in Unity Catalog. The files arrive every business day at 9:00 AM CST. 
 # MAGIC
 # MAGIC ### Frequency
 # MAGIC Business days at 9:15 AM CST.
@@ -30,7 +30,7 @@ end_date = date.today()
 
 date_list = filter_business_days(start_date, end_date)
 
-paths = [f"/mnt/emprisedatastorage/yardi/{run_date:%Y/%m/%d}/*" for run_date in date_list if is_business_day(run_date)]
+paths = [f"/mnt/storage_account/storage_container/{run_date:%Y/%m/%d}/*" for run_date in date_list if is_business_day(run_date)]
 
 # COMMAND ----------
 
@@ -56,9 +56,9 @@ cleaned_df = clean_columns(df, end_date)
 
 # COMMAND ----------
 
-unity_path = "source.yardi"
+unity_path = "catalog.schema"
 unity_writer = UnityWriter(unity_path)
-table_name = 'pha'
+table_name = 'table'
 
 unity_writer.write(df=cleaned_df, table_name=table_name, mode='daily_snapshot', day=end_date)
 
