@@ -1,0 +1,43 @@
+# name: Build SDK
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   build:
+#     runs-on: [azure-prod-linux-runner]
+
+#     env:
+#       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+#       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+#     steps:
+#       - name: Check Out Repository
+#         uses: actions/checkout@v4
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.10"
+
+#       - name: Install build tools
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install build
+
+#       - name: Build wheel
+#         working-directory: data_eng_sdk
+#         run: python -m build
+
+#       - name: Install Databricks CLI
+#         run: |
+#           curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+#       - name: Upload wheel to Unity Catalog Volume
+#         run: |
+#           databricks fs cp \
+#             data_eng_sdk/dist/*.whl \
+#             dbfs:/Volumes/systematic/default/libraries/ \
+#             --overwrite
