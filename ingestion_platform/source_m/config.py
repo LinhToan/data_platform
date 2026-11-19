@@ -1,8 +1,186 @@
 from pyspark.sql.types import StructType, StructField, StringType
+from data_eng_sdk.pipelines import DeliverySchedule
 
-file_type = "daily_file.txt"
+delivery_schedule = DeliverySchedule.CALENDAR_DAYS
 
-#schema provided in MQ Credit Bank Files documentation
-schema = StructType(fields=[
-    StructField('Pretend we have a full schema', StringType(), False),
+demographics_schema = StructType(fields=[
+    StructField('RecordType', StringType(), False),
+    StructField('UserToken', StringType(), False),
+    StructField('UAI', StringType(), True),
+    StructField('ParentUserToken', StringType(), False),
+    StructField('BusinessUserToken', StringType(), False),
+    StructField('ProgramMgr', StringType(), True),
+    StructField('ProgramId', StringType(), True),
+    StructField('CurrentBalance', StringType(), True),
+    StructField('AvailableCredit', StringType(), True),
+    StructField('APR', StringType(), True),
+    StructField('Fees', StringType(), True),
+    StructField('FirstName', StringType(), True),
+    StructField('MiddleName', StringType(), True),
+    StructField('LastName', StringType(), True),
+    StructField('Address1', StringType(), True),
+    StructField('Address2', StringType(), True),
+    StructField('City', StringType(), True),
+    StructField('State', StringType(), True),
+    StructField('Zip', StringType(), True),
+    StructField('CountryCode', StringType(), True),
+    StructField('DateOfBirth', StringType(), True),
+    StructField('Income', StringType(), True),
+    StructField('SocialSecurityNumber', StringType(), True),
+    StructField('EIN', StringType(), True),
+    StructField('Email', StringType(), True),
+    StructField('PhoneNumber', StringType(), True),
+    StructField('SecondaryPhoneNumber', StringType(), True),
+    StructField('KycPass', StringType(), True),
+    StructField('KycTimestamp', StringType(), True),
+    StructField('KycReferenceIDOrder', StringType(), True),
+    StructField('KycProviderId', StringType(), True),
+    StructField('IsExpiredOffer', StringType(), True),
+    StructField('AccountCreatedDate', StringType(), True),
+    StructField('ActivatedDate', StringType(), True),
+    StructField('LastTransactionActivityDate', StringType(), True),
+    StructField('LastUpdateDate', StringType(), True),
+    StructField('ActiveStatus', StringType(), True),
+    StructField('AccountStatus', StringType(), True),
+    StructField('Reason', StringType(), True),
+    StructField('IsTestUser', StringType(), True)
 ])
+
+cards_schema = StructType(fields=[
+    StructField('RecordType', StringType(), False),
+    StructField('UserToken', StringType(), False),
+    StructField('UAI', StringType(), True),
+    StructField('CardToken', StringType(), False),
+    StructField('Pan', StringType(), True),
+    StructField('ProgramMgr', StringType(), True),
+    StructField('ProcessorId', StringType(), True),
+    StructField('ProgramId', StringType(), True),
+    StructField('CardProductId', StringType(), True),
+    StructField('CardVirtual', StringType(), True),
+    StructField('CardType', StringType(), True),
+    StructField('CardStatus', StringType(), True),
+    StructField('AccountCreatedDate', StringType(), True),
+    StructField('CardCreatedDate', StringType(), True),
+    StructField('ActivatedDate', StringType(), True),
+    StructField('CardExpiryDate', StringType(), True),
+    StructField('LastTransactionActivityDate', StringType(), True),
+    StructField('LastUpdateDate', StringType(), True),
+    StructField('CardTerminatedDate', StringType(), True),
+    StructField('Reason', StringType(), True),
+    StructField('ReasonCode', StringType(), True),
+    StructField('IsTestUser', StringType(), True)
+])
+
+transactions_schema = StructType(fields=[
+    StructField('RecordType', StringType(), False),
+    StructField('UserToken', StringType(), False),
+    StructField('UAI', StringType(), True),
+    StructField('CardToken', StringType(), False),
+    StructField('ActingUserToken', StringType(), False),
+    StructField('ProgramId', StringType(), True),
+    StructField('TransactionToken', StringType(), False),
+    StructField('OriginalTransactionToken', StringType(), False),
+    StructField('TransDate', StringType(), True),
+    StructField('TransTime', StringType(), True),
+    StructField('ImpactDate', StringType(), True),
+    StructField('ImpactTime', StringType(), True),
+    StructField('PostedDate', StringType(), True),
+    StructField('PostedTime', StringType(), True),
+    StructField('SettlementDate', StringType(), True),
+    StructField('Network', StringType(), True),
+    StructField('Subnetwork', StringType(), True),
+    StructField('TransactionCurrencyCode', StringType(), True),
+    StructField('TransAmount', StringType(), True),
+    StructField('TranType', StringType(), True),
+    StructField('TransCode', StringType(), True),
+    StructField('MerchantName', StringType(), True),
+    StructField('MerchantCategoryCode', StringType(), True),
+    StructField('MerchantState', StringType(), True),
+    StructField('MerchantCity', StringType(), True),
+    StructField('MerchantStreet', StringType(), True),
+    StructField('MerchantZip', StringType(), True),
+    StructField('MerchantCountry', StringType(), True),
+    StructField('MerchantDivisionId', StringType(), True),
+    StructField('StoreNo', StringType(), True),
+    StructField('MerchantId', StringType(), True),
+    StructField('PosEntryCode', StringType(), True),
+    StructField('TransactionAuthType', StringType(), True),
+    StructField('IssuerFeeAmount', StringType(), True),
+    StructField('InterchangeFeeAmount', StringType(), True),
+    StructField('CrossBorderFeeAmount', StringType(), True),
+    StructField('AcquirerFeeAmount', StringType(), True),
+    StructField('PindebitAssocFeeAmount', StringType(), True),
+    StructField('SwitchFeeAmount', StringType(), True),
+    StructField('CurConvCardholderFeeAmount', StringType(), True),
+    StructField('CurConvIssuerFeeAmount', StringType(), True),
+    StructField('TransactionNotes', StringType(), True),
+    StructField('ResponseCode', StringType(), True),
+    StructField('ReferenceTransactionToken', StringType(), True),
+    StructField('ReferenceTransactionDate', StringType(), True),
+    StructField('MessageType', StringType(), True),
+    StructField('TransentryToken', StringType(), True),
+    StructField('NetworkReferenceId', StringType(), True),
+    StructField('RetrievalReferenceNumber', StringType(), True),
+    StructField('STAN', StringType(), True),
+    StructField('ApprovalNumber', StringType(), True),
+    StructField('Pan', StringType(), True),
+    StructField('IsTestUser', StringType(), True)
+])
+
+financial_adjustments_schema = StructType(fields=[
+    StructField('RecordType', StringType(), False),
+    StructField('UserToken', StringType(), False),
+    StructField('UAI', StringType(), True),
+    StructField('CardToken', StringType(), False),
+    StructField('ActingUserToken', StringType(), False),
+    StructField('ProgramId', StringType(), True),
+    StructField('TransactionToken', StringType(), False),
+    StructField('OriginalTransactionToken', StringType(), False),
+    StructField('TransDate', StringType(), True),
+    StructField('TransTime', StringType(), True),
+    StructField('ImpactDate', StringType(), True),
+    StructField('ImpactTime', StringType(), True),
+    StructField('SettlementDate', StringType(), True),
+    StructField('Network', StringType(), True),
+    StructField('Subnetwork', StringType(), True),
+    StructField('TransactionCurrencyCode', StringType(), True),
+    StructField('TransAmount', StringType(), True),
+    StructField('TranType', StringType(), True),
+    StructField('TransCode', StringType(), True),
+    StructField('PosEntryCode', StringType(), True),
+    StructField('TransactionAuthType', StringType(), True),
+    StructField('IssuerFeeAmount', StringType(), True),
+    StructField('TransactionNotes', StringType(), True),
+    StructField('ResponseCode', StringType(), True),
+    StructField('ReferenceTransactionToken', StringType(), True),
+    StructField('ReferenceTransactionDate', StringType(), True),
+    StructField('MessageType', StringType(), True),
+    StructField('TransentryToken', StringType(), True),
+    StructField('NetworkReferenceId', StringType(), True),
+    StructField('STAN', StringType(), True),
+    StructField('IsTestUser', StringType(), True)
+])
+
+
+mq_files = [
+    {
+        "file_type": "demographics",
+        "schema": demographics_schema
+    },
+    {
+        "file_type": "financial_adjustments",
+        "schema": financial_adjustments_schema
+    },
+    {
+        "file_type": "cards",
+        "schema": cards_schema
+    },
+    {
+        "file_type": "posted",
+        "schema": transactions_schema
+    },
+    {
+        "file_type": "nonbalance",
+        "schema": transactions_schema
+    },
+]

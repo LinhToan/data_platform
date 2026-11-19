@@ -1,7 +1,8 @@
 ### Overview
-# This notebook gets reads in the sample file in CSV format from and updates 
+# This notebook gets reads in the source data file in CSV format from and updates 
 # the respective delta table in Unity Catalog. 
-# The files arrive every business day at 9:00 AM CST. 
+# The files arrive every business day evening, 
+# and the corresponding GoAnywhere job runs the next morning at 9:00 AM CST. 
 
 ### Frequency
 # Business days at 9:15 AM CST.
@@ -17,19 +18,15 @@
 # row level and the `replaceWhere` option that UnityWriter utlizes is atomic.
 
 from datetime import date
-from includes.write import UnityWriter
-from includes.pipeline import IngestionPipeline
+from data_eng_sdk.io import UnityWriter
+from data_eng_sdk.pipelines import IngestionPipeline
+from config import delivery_schedule, unity_config
 from main import main
 
 if __name__=="__main__":
-    unity_config = {
-        "unity_path": "catalog.schema",
-        "table_name": "table",
-        "mode": "daily_snapshot"
-    }
 
     unity_writer = UnityWriter(unity_config)
-    pipeline = IngestionPipeline(unity_writer=unity_writer)
+    pipeline = IngestionPipeline(delivery_schedule=delivery_schedule, unity_writer=unity_writer)
 
     start_date = date.today()
     end_date = date.today()

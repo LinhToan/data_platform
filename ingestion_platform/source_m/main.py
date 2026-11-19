@@ -7,26 +7,25 @@ from pyspark.sql import DataFrame, SparkSession
 def main(dates_list: list[date], file_type: str, schema: StructType) -> DataFrame:
     """
     Overview:
-        Read in raw data files and convert the data to a dataframe.
+        Read in Marqeta credit bank files and convert the data to a dataframe.
     Parameters:
-        file_type: Type of raw data file.
-        schema: Schema for the specific data file.
+        file_type: Type of Marqeta credit bank file.
+        schema: Schema for the specific credit bank file.
         day: Date of the file.
     Return:
-        df (pyspark.sql.dataframe): Dataframe of the data file.
+        df (pyspark.sql.dataframe): Dataframe of the credit bank file.
     """
 
     spark = SparkSession.builder.getOrCreate()
     
-    azure_path = "/mnt/storage_account/storage_container/directory"
+    azure_path = "/mnt/storage_account/blob_container/source_system"
 
     paths = [
-        f"{azure_path}/{file_type}/{run_date}/{file_type[3:]}_1_5_0_*"
+        f"{azure_path}/{file_type}/{run_date}/MQ_{file_type[3:]}_1_5_0_*"
         for run_date in dates_list
     ]
 
-    df = spark.read.option("skipRows", 1).csv(paths, sep=",", schema=schema) \
-        .where(col('RecordType') == 'D')
+    df = spark.read.csv(paths, sep=",", schema=schema).where(col('RecordType') == 'D')
 
     # Run QA tests before returning df
 

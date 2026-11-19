@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC
 # MAGIC ### Overview
-# MAGIC This notebook gets reads in the sample file in CSV format from and updates the respective delta table in Unity Catalog. The files arrive every business day at 9:00 AM CST. 
+# MAGIC This notebook gets reads in the source data file in CSV format from and updates the respective delta table in Unity Catalog. The files arrive every business day at 9:00 AM CST, and the corresponding GoAnywhere job runs accordingly. 
 # MAGIC
 # MAGIC ### Frequency
 # MAGIC Business days at 9:15 AM CST.
@@ -15,8 +15,7 @@
 
 # COMMAND ----------
 
-from data_eng_sdk import UnityWriter, filter_business_days, is_business_day, clean_columns
-# from data_eng_sdk.write import UnityWriter
+# from data_eng_sdk.write import UnityWriter, UnityConfig
 # from data_eng_sdk.utils import is_business_day, get_business_days, get_weekends, clean_columns
 from tests.qa_checks import test_null_columns
 from pyspark.sql import DataFrame
@@ -28,14 +27,16 @@ import re
 start_date = date.today()
 end_date = date.today()
 
-date_list = filter_business_days(start_date, end_date)
+date_list = get_business_days(start_date, end_date)
 
-paths = [f"/mnt/storage_account/storage_container/{run_date:%Y/%m/%d}/*" for run_date in date_list if is_business_day(run_date)]
+file_name = "yardi_pha"
+
+paths = [f"/mnt/storage_account/blob_container/{run_date:%Y/%m/%d}/{file_name}_{run_date.strftime("%Y%m%d")}.csv" for run_date in date_list]
 
 # COMMAND ----------
 
 df = spark.read.csv(
-    paths, 
+    paths[-1], 
     header=True,
     quote='"',        
     escape='"',       
@@ -52,15 +53,27 @@ test_null_columns(df, qa_columns)
 
 # COMMAND ----------
 
-cleaned_df = clean_columns(df, end_date)
+unity_config = UnityConfig(
+    unity_path="catalog.schema",
+    table_name="table",
+    mode=WriteUnityMode.DAILY_SNAPSHOT
+)
+
+unity_writer = UnityWriter(unity_config)
 
 # COMMAND ----------
 
-unity_path = "catalog.schema"
-unity_writer = UnityWriter(unity_path)
-table_name = 'table'
+for run_date in date_list:
+    cleaned_df = clean_columns(df, run_date)
+    unity_writer.write(cleaned_df, run_date)
 
-unity_writer.write(df=cleaned_df, table_name=table_name, mode='daily_snapshot', day=end_date)
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC
+# MAGIC SELECT *
+# MAGIC FROM catalog.schema.table
+# MAGIC ORDER BY file_date DESC
 
 # COMMAND ----------
 

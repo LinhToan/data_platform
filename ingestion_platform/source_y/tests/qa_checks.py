@@ -3,17 +3,15 @@ from pyspark.sql.functions import col
 from functools import reduce
 
 
-
-
 def test_null_columns(df: DataFrame, qa_columns: list[str]) -> int:
     """
     Overview:
         Takes in a given dataframe and its given to check if there are any null values.
     Paramters:
         df: Dataframe to be checked.
-        pk: Primary key column.
+        qa_columns: Columns to check for null values.
     Return:
-        0 to signify success
+        Exceptions message if there are null values.
     """
     spark = SparkSession.builder.getOrCreate()
     
@@ -26,5 +24,3 @@ def test_null_columns(df: DataFrame, qa_columns: list[str]) -> int:
     
     if has_nulls > 0:
         raise Exception(f"Null values found in {qa_columns}")
-
-    return 0
